@@ -73,29 +73,34 @@
             box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
         }
 
-        /* Weeks Selector Bar */
+        /* Controls Bar for Weeks */
+        .weeks-control-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 15px;
+            background: var(--card-bg);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--card-border);
+        }
+
         .weeks-scroll {
             display: flex;
             gap: 8px;
             overflow-x: auto;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
             scrollbar-width: thin;
             scrollbar-color: var(--primary-red) var(--card-bg);
+            flex-grow: 1;
         }
 
-        .weeks-scroll::-webkit-scrollbar {
-            height: 4px;
-        }
-
-        .weeks-scroll::-webkit-scrollbar-thumb {
-            background: var(--primary-red);
-            border-radius: 4px;
-        }
+        .weeks-scroll::-webkit-scrollbar { height: 4px; }
+        .weeks-scroll::-webkit-scrollbar-thumb { background: var(--primary-red); border-radius: 4px; }
 
         .week-btn {
             min-width: 90px;
-            background: var(--card-bg);
+            background: #0a0a0a;
             border: 1px solid var(--card-border);
             color: var(--text-muted);
             padding: 8px 12px;
@@ -104,20 +109,11 @@
             font-size: 12px;
             font-weight: 700;
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 2px;
+            justify-content: center;
+            gap: 6px;
             flex-shrink: 0;
             transition: all 0.2s;
-        }
-
-        .week-btn span.icon {
-            font-size: 14px;
-        }
-
-        .week-btn:hover {
-            border-color: var(--primary-red);
-            color: #fff;
         }
 
         .week-btn.active {
@@ -125,6 +121,37 @@
             border-color: var(--primary-red);
             color: #ffffff;
             box-shadow: inset 0 0 8px rgba(220, 38, 38, 0.4);
+        }
+
+        .btn-add-week {
+            background: var(--primary-red);
+            color: #fff;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .btn-del-week {
+            background: #262626;
+            color: #ef4444;
+            border: 1px solid #3f3f46;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .days-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
         }
 
         .page { display: none; }
@@ -138,9 +165,7 @@
             border: 1px solid var(--card-border);
         }
 
-        .day-card { 
-            border-right: 4px solid var(--primary-red); 
-        }
+        .day-card { border-right: 4px solid var(--primary-red); }
 
         .day-header {
             display: flex;
@@ -151,30 +176,11 @@
             padding-bottom: 10px;
         }
 
-        h2 {
-            font-size: 18px;
-            font-weight: 800;
-            color: #ffffff;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        h2 { font-size: 18px; font-weight: 800; color: #ffffff; }
+        p.desc { color: var(--text-muted); font-size: 12px; margin-bottom: 15px; }
 
-        p.desc {
-            color: var(--text-muted);
-            font-size: 12px;
-            margin-bottom: 15px;
-        }
-
-        /* Inputs & Controls */
-        label {
-            display: block;
-            margin-bottom: 4px;
-            color: var(--text-muted);
-            font-size: 11px;
-            font-weight: 600;
-        }
-
+        /* Inputs & Buttons */
+        label { display: block; margin-bottom: 4px; color: var(--text-muted); font-size: 11px; font-weight: 600; }
         input, select {
             width: 100%;
             padding: 8px;
@@ -186,7 +192,6 @@
             font-weight: 600;
             outline: none;
         }
-
         input:focus, select:focus { border-color: var(--primary-red); }
 
         .btn-action {
@@ -212,21 +217,10 @@
             width: 100%;
         }
 
-        /* Responsive Mobile Table Grid */
+        /* Mobile Table Grid */
         .table-responsive { overflow-x: auto; }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            border: 1px solid var(--card-border);
-            padding: 8px;
-            text-align: center;
-            font-size: 12px;
-        }
-
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid var(--card-border); padding: 8px; text-align: center; font-size: 12px; }
         th { background-color: #1c1c1c; color: var(--text-main); }
 
         .dual-inputs { display: flex; flex-direction: column; gap: 4px; }
@@ -245,7 +239,6 @@
                 margin-bottom: 12px;
                 border: 1px solid var(--card-border);
             }
-
             .mobile-grid-table td {
                 border: none;
                 padding: 0;
@@ -254,7 +247,6 @@
                 flex-direction: column;
                 justify-content: center;
             }
-
             .mobile-grid-table td::before {
                 content: attr(data-label);
                 font-size: 10px;
@@ -262,10 +254,7 @@
                 font-weight: 700;
                 margin-bottom: 2px;
             }
-
-            .mobile-grid-table td.full-width {
-                grid-column: span 2;
-            }
+            .mobile-grid-table td.full-width { grid-column: span 2; }
         }
     </style>
 </head>
@@ -274,14 +263,14 @@
 <div class="container">
     <div class="nav-tabs">
         <button class="tab-btn active" onclick="switchPage(1, event)">الماكس والوزن</button>
-        <button class="tab-btn" onclick="switchPage(2, event)">جدول التمارين (10 أسابيع)</button>
+        <button class="tab-btn" onclick="switchPage(2, event)">جدول التمارين الديناميكي</button>
     </div>
 
-    <!-- الصفحة الأولى: ماكس الرفعات والوزن -->
+    <!-- الصفحة الأولى -->
     <div id="page1" class="page active">
         <div class="card">
             <h2>أقصى أوزان العدات (Max Reps)</h2>
-            <p class="desc">تعديل الأرقام هنا يحديث أوزان التمارين المطلوبة فوراً:</p>
+            <p class="desc">تعديل الأرقام هنا يحدث أوزان التمارين المطلوبة فوراً:</p>
             
             <div class="table-responsive">
                 <table>
@@ -354,10 +343,20 @@
         </div>
     </div>
 
-    <!-- الصفحة الثانية: الجدول الأسبوعي (10 أسابيع) -->
+    <!-- الصفحة الثانية -->
     <div id="page2" class="page">
-        <!-- شريط أيقونات الأسابيع الـ 10 -->
-        <div class="weeks-scroll" id="weeksBar"></div>
+        <!-- شريط التحكم بالأسابيع -->
+        <div class="weeks-control-bar">
+            <div class="weeks-scroll" id="weeksBar"></div>
+            <button class="btn-add-week" onclick="addNewWeek()">+ أسبوع جديد</button>
+            <button class="btn-del-week" onclick="deleteCurrentWeek()">حذف الأسبوع</button>
+        </div>
+
+        <!-- أزرار الأيام للأسبوع الحقيقي -->
+        <div class="days-controls">
+            <h3 id="currentWeekTitle" style="color: #fff; font-size: 16px;">الأسبوع 1</h3>
+            <button class="btn-action" onclick="addNewDay()">+ إضافة يوم تدريبي</button>
+        </div>
 
         <!-- الأيام الخاصة بالأسبوع المختار -->
         <div id="daysContainer"></div>
@@ -365,11 +364,11 @@
 </div>
 
 <script>
-    // Supabase Initialization
     const SUPABASE_URL = 'https://zkgkpguurqyizzbzxuzd.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_6PDUEqp0EgF1Cmd49WRhYA_2XTVocpi';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+    let weeksList = [];
     let currentWeek = 1;
 
     function switchPage(pageNum, event) {
@@ -379,142 +378,140 @@
         event.target.classList.add('active');
     }
 
-    // --- 1. بناء شريط الأسابيع الـ 10 ---
-    function buildWeeksBar() {
+    // --- 1. إدارة الأسابيع الديناميكية ---
+    async function loadWeeks() {
+        const { data, error } = await _supabase.from('workout_weeks').select('*').order('week_num', { ascending: true });
+        
+        if (data && data.length > 0) {
+            weeksList = data.map(w => w.week_num);
+        } else {
+            // إضافة الأسبوع 1 كافتراضي إذا لم تكن هناك أسابيع
+            await _supabase.from('workout_weeks').insert([{ week_num: 1 }]);
+            weeksList = [1];
+        }
+        
+        if (!weeksList.includes(currentWeek)) {
+            currentWeek = weeksList[0];
+        }
+        
+        renderWeeksBar();
+        loadDaysForWeek(currentWeek);
+    }
+
+    function renderWeeksBar() {
         const bar = document.getElementById('weeksBar');
         bar.innerHTML = '';
-        for (let w = 1; w <= 10; w++) {
+        weeksList.forEach(w => {
             bar.innerHTML += `
-                <button class="week-btn ${w === 1 ? 'active' : ''}" id="week-btn-${w}" onclick="selectWeek(${w})">
-                    <span class="icon">📅</span>
-                    <span>الأسبوع ${w}</span>
+                <button class="week-btn ${w === currentWeek ? 'active' : ''}" id="week-btn-${w}" onclick="selectWeek(${w})">
+                    📅 أسبوع ${w}
                 </button>
             `;
+        });
+        document.getElementById('currentWeekTitle').innerText = `الأسبوع ${currentWeek}`;
+    }
+
+    async function addNewWeek() {
+        const nextWeekNum = weeksList.length > 0 ? Math.max(...weeksList) + 1 : 1;
+        const { error } = await _supabase.from('workout_weeks').insert([{ week_num: nextWeekNum }]);
+        if (!error) {
+            weeksList.push(nextWeekNum);
+            selectWeek(nextWeekNum);
         }
+    }
+
+    async function deleteCurrentWeek() {
+        if (weeksList.length <= 1) return alert("يجب إبقاء أسبوع واحد على الأقل!");
+        if (!confirm(`هل أنت تأكد من حذف الأسبوع ${currentWeek} بجميع أيامه وتمارينه؟`)) return;
+
+        await _supabase.from('workout_schedule').delete().eq('week_num', currentWeek);
+        await _supabase.from('workout_weeks').delete().eq('week_num', currentWeek);
+
+        weeksList = weeksList.filter(w => w !== currentWeek);
+        currentWeek = weeksList[0];
+        loadWeeks();
     }
 
     function selectWeek(weekNum) {
         currentWeek = weekNum;
-        document.querySelectorAll('.week-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(`week-btn-${weekNum}`)?.classList.add('active');
+        renderWeeksBar();
+        loadDaysForWeek(currentWeek);
+    }
+
+    // --- 2. إدارة الأيام والتمرينات ---
+    async function loadDaysForWeek(weekNum) {
+        const container = document.getElementById('daysContainer');
+        container.innerHTML = '';
+
+        const { data } = await _supabase
+            .from('workout_schedule')
+            .select('*')
+            .eq('week_num', weekNum)
+            .order('day_num', { ascending: true });
+
+        // تجميع الأيام المتاحة لهذا الأسبوع
+        const dayNumbers = [...new Set(data ? data.map(i => i.day_num) : [])];
         
-        buildWorkoutDays();
-        loadScheduleForCurrentWeek();
-    }
-
-    // --- 2. إدارة أقصى الرفعات (Max Reps) ---
-    async function loadMaxReps() {
-        try {
-            const { data, error } = await _supabase.from('max_reps').select('*');
-            if (error) console.error(error);
-            if (data && data.length > 0) {
-                data.forEach(row => {
-                    for (let i = 1; i <= 5; i++) {
-                        const el = document.getElementById(`${row.lift}_${i}`);
-                        if (el && row[`rep${i}`] !== undefined) {
-                            el.value = row[`rep${i}`];
-                        }
-                    }
-                });
-            }
-        } catch (e) {
-            console.error(e);
-        } finally {
-            updateAllCalculations();
-        }
-    }
-
-    let maxRepsTimer = null;
-    function saveMaxReps(lift) {
-        updateAllCalculations();
-        clearTimeout(maxRepsTimer);
-        maxRepsTimer = setTimeout(async () => {
-            const rowData = {
-                lift: lift,
-                rep1: parseFloat(document.getElementById(`${lift}_1`).value) || 0,
-                rep2: parseFloat(document.getElementById(`${lift}_2`).value) || 0,
-                rep3: parseFloat(document.getElementById(`${lift}_3`).value) || 0,
-                rep4: parseFloat(document.getElementById(`${lift}_4`).value) || 0,
-                rep5: parseFloat(document.getElementById(`${lift}_5`).value) || 0
-            };
-            await _supabase.from('max_reps').upsert([rowData], { onConflict: 'lift' });
-        }, 500);
-    }
-
-    // --- 3. إدارة الوزن اليومي ---
-    async function loadBodyWeight() {
-        const { data } = await _supabase.from('body_weight').select('*').order('date', { ascending: false });
-        const tbody = document.getElementById('weightHistoryTable');
-        tbody.innerHTML = '';
-        if (data) {
-            data.forEach(item => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${item.date}</td>
-                        <td><strong>${item.weight} kg</strong></td>
-                        <td><button class="btn-delete" onclick="deleteWeight(${item.id})">حذف</button></td>
-                    </tr>`;
+        // إذا كان أسبوع جديد بدون أيام، نبدأ باليوم 1 تلقائياً
+        if (dayNumbers.length === 0) {
+            renderDayCard(1);
+        } else {
+            dayNumbers.forEach(dNum => {
+                renderDayCard(dNum);
+                const dayItems = data.filter(i => i.day_num === dNum);
+                dayItems.forEach(item => renderRow(dNum, item));
             });
         }
     }
 
-    async function addDailyWeight() {
-        const date = document.getElementById('weightDate').value;
-        const weight = parseFloat(document.getElementById('dailyWeightInput').value);
-
-        if (!date || !weight) return alert('الرجاء كتابة الوزن والتاريخ');
-
-        const { error } = await _supabase.from('body_weight').insert([{ date, weight }]);
-        if (!error) {
-            document.getElementById('dailyWeightInput').value = '';
-            loadBodyWeight();
-        }
-    }
-
-    async function deleteWeight(id) {
-        const { error } = await _supabase.from('body_weight').delete().eq('id', id);
-        if (!error) loadBodyWeight();
-    }
-
-    // --- 4. بناء الأيام الخمسة للأسبوع المختار ---
-    function buildWorkoutDays() {
+    function renderDayCard(dayNum) {
         const container = document.getElementById('daysContainer');
-        container.innerHTML = '';
-        for (let d = 1; d <= 5; d++) {
-            container.innerHTML += `
-                <div class="card day-card">
-                    <div class="day-header">
-                        <h2>اليوم ${d} - الأسبوع ${currentWeek}</h2>
-                        <button class="btn-action" onclick="addRow(${d})">+ إضافة تمرين</button>
-                    </div>
-                    <table class="mobile-grid-table">
-                        <thead>
-                            <tr>
-                                <th>التمرين</th>
-                                <th>الرفعة</th>
-                                <th>النظام</th>
-                                <th>العدات/الجولات</th>
-                                <th>النسبة %</th>
-                                <th>RPE</th>
-                                <th>الوزن</th>
-                                <th>حذف</th>
-                            </tr>
-                        </thead>
-                        <tbody id="day-${d}-rows"></tbody>
-                    </table>
-                </div>`;
-        }
+        if (document.getElementById(`day-card-${dayNum}`)) return;
+
+        const div = document.createElement('div');
+        div.className = 'card day-card';
+        div.id = `day-card-${dayNum}`;
+        div.innerHTML = `
+            <div class="day-header">
+                <h2>اليوم ${dayNum}</h2>
+                <div style="display:flex; gap: 8px;">
+                    <button class="btn-action" onclick="addRow(${dayNum})">+ إضافة تمرين</button>
+                    <button class="btn-delete" style="width:auto;" onclick="deleteDay(${dayNum})">حذف اليوم</button>
+                </div>
+            </div>
+            <table class="mobile-grid-table">
+                <thead>
+                    <tr>
+                        <th>التمرين</th>
+                        <th>الرفعة</th>
+                        <th>النظام</th>
+                        <th>العدات/الجولات</th>
+                        <th>النسبة %</th>
+                        <th>RPE</th>
+                        <th>الوزن</th>
+                        <th>حذف</th>
+                    </tr>
+                </thead>
+                <tbody id="day-${dayNum}-rows"></tbody>
+            </table>
+        `;
+        container.appendChild(div);
     }
 
-    async function loadScheduleForCurrentWeek() {
-        const { data } = await _supabase
-            .from('workout_schedule')
-            .select('*')
-            .eq('week_num', currentWeek);
-            
-        if (data) {
-            data.forEach(item => renderRow(item.day_num, item));
-        }
+    async function addNewDay() {
+        const existingDays = Array.from(document.querySelectorAll('.day-card')).map(card => parseInt(card.id.replace('day-card-', '')));
+        const nextDayNum = existingDays.length > 0 ? Math.max(...existingDays) + 1 : 1;
+        renderDayCard(nextDayNum);
+    }
+
+    async function deleteDay(dayNum) {
+        if (!confirm(`هل أنت متاكد من حذف اليوم ${dayNum}؟`)) return;
+        
+        document.getElementById(`day-card-${dayNum}`)?.remove();
+        await _supabase.from('workout_schedule')
+            .delete()
+            .eq('week_num', currentWeek)
+            .eq('day_num', dayNum);
     }
 
     function addRow(dayNum) {
@@ -732,8 +729,8 @@
             const row = document.getElementById(rowId);
             if (!row) return;
 
-            const headerText = row.closest('.day-card').querySelector('h2').innerText;
-            const dayNum = parseInt(headerText.match(/اليوم (\d+)/)[1]);
+            const dayCard = row.closest('.day-card');
+            const dayNum = parseInt(dayCard.id.replace('day-card-', ''));
             const setType = row.querySelector('.set-type').value;
 
             let repsStr = '', pctStr = '', rpeStr = '';
@@ -769,17 +766,85 @@
         await _supabase.from('workout_schedule').delete().eq('id', rowId);
     }
 
+    // --- 3. أقصى الأوزان والوزن اليومي ---
+    async function loadMaxReps() {
+        try {
+            const { data } = await _supabase.from('max_reps').select('*');
+            if (data && data.length > 0) {
+                data.forEach(row => {
+                    for (let i = 1; i <= 5; i++) {
+                        const el = document.getElementById(`${row.lift}_${i}`);
+                        if (el && row[`rep${i}`] !== undefined) el.value = row[`rep${i}`];
+                    }
+                });
+            }
+        } catch (e) {
+            console.error(e);
+        } finally {
+            updateAllCalculations();
+        }
+    }
+
+    let maxRepsTimer = null;
+    function saveMaxReps(lift) {
+        updateAllCalculations();
+        clearTimeout(maxRepsTimer);
+        maxRepsTimer = setTimeout(async () => {
+            const rowData = {
+                lift: lift,
+                rep1: parseFloat(document.getElementById(`${lift}_1`).value) || 0,
+                rep2: parseFloat(document.getElementById(`${lift}_2`).value) || 0,
+                rep3: parseFloat(document.getElementById(`${lift}_3`).value) || 0,
+                rep4: parseFloat(document.getElementById(`${lift}_4`).value) || 0,
+                rep5: parseFloat(document.getElementById(`${lift}_5`).value) || 0
+            };
+            await _supabase.from('max_reps').upsert([rowData], { onConflict: 'lift' });
+        }, 500);
+    }
+
+    async function loadBodyWeight() {
+        const { data } = await _supabase.from('body_weight').select('*').order('date', { ascending: false });
+        const tbody = document.getElementById('weightHistoryTable');
+        tbody.innerHTML = '';
+        if (data) {
+            data.forEach(item => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${item.date}</td>
+                        <td><strong>${item.weight} kg</strong></td>
+                        <td><button class="btn-delete" onclick="deleteWeight(${item.id})">حذف</button></td>
+                    </tr>`;
+            });
+        }
+    }
+
+    async function addDailyWeight() {
+        const date = document.getElementById('weightDate').value;
+        const weight = parseFloat(document.getElementById('dailyWeightInput').value);
+
+        if (!date || !weight) return alert('الرجاء كتابة الوزن والتاريخ');
+
+        const { error } = await _supabase.from('body_weight').insert([{ date, weight }]);
+        if (!error) {
+            document.getElementById('dailyWeightInput').value = '';
+            loadBodyWeight();
+        }
+    }
+
+    async function deleteWeight(id) {
+        const { error } = await _supabase.from('body_weight').delete().eq('id', id);
+        if (!error) loadBodyWeight();
+    }
+
     function updateAllCalculations() {
         document.querySelectorAll('tr[id^="row_"]').forEach(tr => calculateRowWeight(tr.id));
     }
 
     window.onload = async function() {
-        buildWeeksBar();
-        buildWorkoutDays();
         document.getElementById('weightDate').valueAsDate = new Date();
         await loadMaxReps();
         await loadBodyWeight();
-        await loadScheduleForCurrentWeek();
+        await loadWeeks();
     };
 </script>
 
