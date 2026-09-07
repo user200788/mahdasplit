@@ -2,14 +2,14 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>منصة التدريب الاحترافية - Powerlifting</title>
     <!-- خط Cairo -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Supabase JS Client Client -->
+    <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
@@ -28,13 +28,14 @@
             margin: 0;
             padding: 0;
             font-family: 'Cairo', system-ui, -apple-system, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             background-color: var(--bg-color);
             color: var(--text-main);
-            padding: 30px 15px;
-            line-height: 1.6;
+            padding: 15px 10px;
+            line-height: 1.5;
         }
 
         .container {
@@ -42,36 +43,34 @@
             margin: 0 auto;
         }
 
+        /* Nav Tabs Responsive */
         .nav-tabs {
             display: flex;
-            gap: 12px;
-            margin-bottom: 25px;
+            gap: 8px;
+            margin-bottom: 20px;
             border-bottom: 2px solid var(--card-border);
-            padding-bottom: 12px;
+            padding-bottom: 10px;
         }
 
         .tab-btn {
+            flex: 1;
             background: var(--card-bg);
             color: var(--text-muted);
             border: 1px solid var(--card-border);
-            padding: 12px 28px;
+            padding: 10px 12px;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 15px;
+            font-size: 13px;
             font-weight: 700;
+            text-align: center;
             transition: all 0.25s ease-in-out;
-        }
-
-        .tab-btn:hover {
-            border-color: var(--primary-red);
-            color: #fff;
         }
 
         .tab-btn.active {
             background: var(--primary-red);
             color: #ffffff;
             border-color: var(--primary-red);
-            box-shadow: 0 4px 14px rgba(220, 38, 38, 0.4);
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
         }
 
         .page { display: none; }
@@ -79,59 +78,52 @@
 
         .card {
             background: var(--card-bg);
-            border-radius: 8px;
-            padding: 24px;
-            margin-bottom: 25px;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 20px;
             border: 1px solid var(--card-border);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
         }
 
-        .day-card { border-right: 5px solid var(--primary-red); }
+        .day-card { 
+            border-right: 4px solid var(--primary-red); 
+        }
+
+        .day-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 10px;
+        }
 
         h2 {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 800;
-            margin-bottom: 15px;
             color: #ffffff;
             display: flex;
             align-items: center;
-            gap: 10px;
-        }
-
-        h2::before {
-            content: '';
-            display: inline-block;
-            width: 4px;
-            height: 20px;
-            background-color: var(--primary-red);
+            gap: 8px;
         }
 
         p.desc {
             color: var(--text-muted);
-            font-size: 14px;
-            margin-bottom: 20px;
+            font-size: 12px;
+            margin-bottom: 15px;
         }
 
-        .input-group {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 10px;
-            flex-wrap: wrap;
-        }
-
-        .field { flex: 1; min-width: 220px; }
-
+        /* Inputs & Controls */
         label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
             color: var(--text-muted);
-            font-size: 13px;
+            font-size: 11px;
             font-weight: 600;
         }
 
         input, select {
             width: 100%;
-            padding: 8px 10px;
+            padding: 8px;
             border-radius: 6px;
             border: 1px solid var(--card-border);
             background: #0a0a0a;
@@ -139,129 +131,142 @@
             font-size: 13px;
             font-weight: 600;
             outline: none;
-            transition: border-color 0.2s;
         }
 
         input:focus, select:focus { border-color: var(--primary-red); }
-
-        .table-responsive { overflow-x: auto; }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-            background-color: #111111;
-            border-radius: 6px;
-            overflow: hidden;
-        }
-
-        th, td {
-            border: 1px solid var(--card-border);
-            padding: 10px 8px;
-            text-align: center;
-            font-size: 13px;
-            vertical-align: middle;
-        }
-
-        th { background-color: #1c1c1c; color: var(--text-main); font-weight: 700; }
-
-        .table-input {
-            width: 80px;
-            padding: 6px;
-            text-align: center;
-            margin: 0 auto;
-        }
-
-        .dual-inputs { display: flex; flex-direction: column; gap: 6px; }
-        .dual-inputs input { font-size: 12px; padding: 5px; }
-
-        .set-label {
-            font-size: 10px;
-            color: var(--text-muted);
-            display: block;
-            margin-bottom: 2px;
-        }
-
-        .calculated-val { font-weight: 800; color: #4ade80; font-size: 14px; }
 
         .btn-action {
             background: var(--primary-red);
             color: #fff;
             border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
+            padding: 8px 14px;
+            border-radius: 6px;
             cursor: pointer;
             font-weight: 700;
-            font-size: 13px;
-            transition: background 0.2s;
+            font-size: 12px;
         }
-
-        .btn-action:hover { background: var(--red-hover); }
 
         .btn-delete {
             background: #262626;
             color: #ef4444;
             border: 1px solid #3f3f46;
-            padding: 6px 12px;
-            border-radius: 4px;
+            padding: 6px 10px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 700;
+            width: 100%;
         }
 
-        .btn-delete:hover { background: #ef4444; color: #fff; }
+        /* --- الجدول التكيفي للهواتف (Responsive Table to Cards) --- */
+        .table-responsive { overflow-x: auto; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid var(--card-border);
+            padding: 8px;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        th { background-color: #1c1c1c; color: var(--text-main); }
+
+        .dual-inputs { display: flex; flex-direction: column; gap: 4px; }
+        .set-label { font-size: 9px; color: var(--text-muted); display: block; }
+        .calculated-val { font-weight: 800; color: #4ade80; font-size: 13px; }
+
+        /* الشاشات الصغيرة: تحويل الصفوف لكروت سريعة الاستجابة */
+        @media (max-width: 768px) {
+            .mobile-grid-table thead { display: none; }
+            .mobile-grid-table tbody tr {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+                background: #111;
+                padding: 12px;
+                border-radius: 8px;
+                margin-bottom: 12px;
+                border: 1px solid var(--card-border);
+            }
+
+            .mobile-grid-table td {
+                border: none;
+                padding: 0;
+                text-align: right;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+
+            .mobile-grid-table td::before {
+                content: attr(data-label);
+                font-size: 10px;
+                color: var(--text-muted);
+                font-weight: 700;
+                margin-bottom: 2px;
+            }
+
+            /* توسيع حقل اسم التمرين ليعبر الكرت بالكامل */
+            .mobile-grid-table td.full-width {
+                grid-column: span 2;
+            }
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="nav-tabs">
-        <button class="tab-btn active" onclick="switchPage(1, event)">بيانات ماكس الرفعات والوزن اليومي</button>
-        <button class="tab-btn" onclick="switchPage(2, event)">الجدول التدريبي الأسبوعي (5 أيام)</button>
+        <button class="tab-btn active" onclick="switchPage(1, event)">الماكس والوزن</button>
+        <button class="tab-btn" onclick="switchPage(2, event)">جدول التمارين (5 أيام)</button>
     </div>
 
-    <!-- الصفحة الأولى -->
+    <!-- الصفحة الأولى: ماكس الرفعات والوزن -->
     <div id="page1" class="page active">
         <div class="card">
-            <h2>سجل أقصى أوزان العدات (Max Reps)</h2>
-            <p class="desc">تُحفظ التغييرات تلقائياً وتُحدث حسابات أوزان التمارين في الجدول فوراً:</p>
+            <h2>أقصى أوزان العدات (Max Reps)</h2>
+            <p class="desc">تعديل الأرقام هنا يحديث أوزان التمارين المطلوبة فوراً:</p>
             
             <div class="table-responsive">
                 <table>
                     <thead>
                         <tr>
-                            <th style="width: 20%;">نوع الرفعة</th>
-                            <th style="color: var(--primary-red);">1 عدّة (1RM)</th>
-                            <th>عدتان (2)</th>
-                            <th>3 عدّات</th>
-                            <th>4 عدّات</th>
-                            <th>5 عدّات</th>
+                            <th>الرفعة</th>
+                            <th style="color: var(--primary-red);">1RM</th>
+                            <th>2RM</th>
+                            <th>3RM</th>
+                            <th>4RM</th>
+                            <th>5RM</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td><strong>السكوات (Squat)</strong></td>
-                            <td><input type="number" id="squat_1" class="table-input" value="100" style="border-color: var(--primary-red);" oninput="saveMaxReps('squat')"></td>
-                            <td><input type="number" id="squat_2" class="table-input" value="95" oninput="saveMaxReps('squat')"></td>
-                            <td><input type="number" id="squat_3" class="table-input" value="90" oninput="saveMaxReps('squat')"></td>
-                            <td><input type="number" id="squat_4" class="table-input" value="85" oninput="saveMaxReps('squat')"></td>
-                            <td><input type="number" id="squat_5" class="table-input" value="80" oninput="saveMaxReps('squat')"></td>
+                            <td><strong>سكوات</strong></td>
+                            <td><input type="number" id="squat_1" value="100" oninput="saveMaxReps('squat')"></td>
+                            <td><input type="number" id="squat_2" value="95" oninput="saveMaxReps('squat')"></td>
+                            <td><input type="number" id="squat_3" value="90" oninput="saveMaxReps('squat')"></td>
+                            <td><input type="number" id="squat_4" value="85" oninput="saveMaxReps('squat')"></td>
+                            <td><input type="number" id="squat_5" value="80" oninput="saveMaxReps('squat')"></td>
                         </tr>
                         <tr>
-                            <td><strong>البنج بريس (Bench)</strong></td>
-                            <td><input type="number" id="bench_1" class="table-input" value="100" style="border-color: var(--primary-red);" oninput="saveMaxReps('bench')"></td>
-                            <td><input type="number" id="bench_2" class="table-input" value="95" oninput="saveMaxReps('bench')"></td>
-                            <td><input type="number" id="bench_3" class="table-input" value="90" oninput="saveMaxReps('bench')"></td>
-                            <td><input type="number" id="bench_4" class="table-input" value="85" oninput="saveMaxReps('bench')"></td>
-                            <td><input type="number" id="bench_5" class="table-input" value="80" oninput="saveMaxReps('bench')"></td>
+                            <td><strong>بنج بريس</strong></td>
+                            <td><input type="number" id="bench_1" value="100" oninput="saveMaxReps('bench')"></td>
+                            <td><input type="number" id="bench_2" value="95" oninput="saveMaxReps('bench')"></td>
+                            <td><input type="number" id="bench_3" value="90" oninput="saveMaxReps('bench')"></td>
+                            <td><input type="number" id="bench_4" value="85" oninput="saveMaxReps('bench')"></td>
+                            <td><input type="number" id="bench_5" value="80" oninput="saveMaxReps('bench')"></td>
                         </tr>
                         <tr>
-                            <td><strong>الديدليفت (Deadlift)</strong></td>
-                            <td><input type="number" id="deadlift_1" class="table-input" value="100" style="border-color: var(--primary-red);" oninput="saveMaxReps('deadlift')"></td>
-                            <td><input type="number" id="deadlift_2" class="table-input" value="95" oninput="saveMaxReps('deadlift')"></td>
-                            <td><input type="number" id="deadlift_3" class="table-input" value="90" oninput="saveMaxReps('deadlift')"></td>
-                            <td><input type="number" id="deadlift_4" class="table-input" value="85" oninput="saveMaxReps('deadlift')"></td>
-                            <td><input type="number" id="deadlift_5" class="table-input" value="80" oninput="saveMaxReps('deadlift')"></td>
+                            <td><strong>ديدليفت</strong></td>
+                            <td><input type="number" id="deadlift_1" value="100" oninput="saveMaxReps('deadlift')"></td>
+                            <td><input type="number" id="deadlift_2" value="95" oninput="saveMaxReps('deadlift')"></td>
+                            <td><input type="number" id="deadlift_3" value="90" oninput="saveMaxReps('deadlift')"></td>
+                            <td><input type="number" id="deadlift_4" value="85" oninput="saveMaxReps('deadlift')"></td>
+                            <td><input type="number" id="deadlift_5" value="80" oninput="saveMaxReps('deadlift')"></td>
                         </tr>
                     </tbody>
                 </table>
@@ -269,19 +274,17 @@
         </div>
 
         <div class="card">
-            <h2>متابعة وزن اللاعب اليومي</h2>
-            <div class="input-group">
-                <div class="field">
+            <h2>متابعة وزن الجسم اليومي</h2>
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;">
+                <div>
                     <label>التاريخ</label>
                     <input type="date" id="weightDate">
                 </div>
-                <div class="field">
-                    <label>وزن الجسم (kg)</label>
-                    <input type="number" step="0.1" id="dailyWeightInput" placeholder="مثال: 74.5">
+                <div>
+                    <label>الوزن (kg)</label>
+                    <input type="number" step="0.1" id="dailyWeightInput" placeholder="75.0">
                 </div>
-                <div class="field" style="align-self: flex-end;">
-                    <button class="btn-action" style="width: 100%; height: 42px;" onclick="addDailyWeight()">حفظ الوزن</button>
-                </div>
+                <button class="btn-action" style="height: 40px;" onclick="addDailyWeight()">حفظ الوزن</button>
             </div>
             
             <div class="table-responsive">
@@ -289,29 +292,24 @@
                     <thead>
                         <tr>
                             <th>التاريخ</th>
-                            <th>الوزن المسجل (kg)</th>
+                            <th>الوزن</th>
                             <th>إجراء</th>
                         </tr>
                     </thead>
-                    <tbody id="weightHistoryTable">
-                    </tbody>
+                    <tbody id="weightHistoryTable"></tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <!-- الصفحة الثانية -->
+    <!-- الصفحة الثانية: الجدول الأسبوعي -->
     <div id="page2" class="page">
-        <div class="card">
-            <h2>الجدول الأسبوعي (5 أيام)</h2>
-            <p class="desc">يتم الحفظ والتزامن مع قاعدة البيانات تلقائياً عند تغيير أو إضافة أي تمرين.</p>
-        </div>
         <div id="daysContainer"></div>
     </div>
 </div>
 
 <script>
-    // تهيئة Supabase
+    // Supabase Initialization
     const SUPABASE_URL = 'https://zkgkpguurqyizzbzxuzd.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_6PDUEqp0EgF1Cmd49WRhYA_2XTVocpi';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -323,11 +321,11 @@
         event.target.classList.add('active');
     }
 
-    // --- 1. إدارة ماكس الرفعات ---
+    // --- 1. إدارة أقصى الرفعات (Max Reps) ---
     async function loadMaxReps() {
         try {
             const { data, error } = await _supabase.from('max_reps').select('*');
-            if (error) console.error('Error fetching max reps:', error);
+            if (error) console.error(error);
             if (data && data.length > 0) {
                 data.forEach(row => {
                     for (let i = 1; i <= 5; i++) {
@@ -345,11 +343,11 @@
         }
     }
 
-    let maxRepsDebounceTimer = null;
+    let maxRepsTimer = null;
     function saveMaxReps(lift) {
         updateAllCalculations();
-        clearTimeout(maxRepsDebounceTimer);
-        maxRepsDebounceTimer = setTimeout(async () => {
+        clearTimeout(maxRepsTimer);
+        maxRepsTimer = setTimeout(async () => {
             const rowData = {
                 lift: lift,
                 rep1: parseFloat(document.getElementById(`${lift}_1`).value) || 0,
@@ -358,21 +356,19 @@
                 rep4: parseFloat(document.getElementById(`${lift}_4`).value) || 0,
                 rep5: parseFloat(document.getElementById(`${lift}_5`).value) || 0
             };
-            const { error } = await _supabase.from('max_reps').upsert([rowData], { onConflict: 'lift' });
-            if (error) console.error('Error saving max reps:', error);
+            await _supabase.from('max_reps').upsert([rowData], { onConflict: 'lift' });
         }, 500);
     }
 
     // --- 2. إدارة الوزن اليومي ---
     async function loadBodyWeight() {
-        const { data, error } = await _supabase.from('body_weight').select('*').order('date', { ascending: false });
-        if (error) console.error('Error fetching weights:', error);
+        const { data } = await _supabase.from('body_weight').select('*').order('date', { ascending: false });
         const tbody = document.getElementById('weightHistoryTable');
         tbody.innerHTML = '';
         if (data) {
             data.forEach(item => {
                 tbody.innerHTML += `
-                    <tr id="weight-${item.id}">
+                    <tr>
                         <td>${item.date}</td>
                         <td><strong>${item.weight} kg</strong></td>
                         <td><button class="btn-delete" onclick="deleteWeight(${item.id})">حذف</button></td>
@@ -385,19 +381,13 @@
         const date = document.getElementById('weightDate').value;
         const weight = parseFloat(document.getElementById('dailyWeightInput').value);
 
-        if (!date || !weight) {
-            alert('الرجاء تعبئة التاريخ والوزن');
-            return;
-        }
+        if (!date || !weight) return alert('الرجاء كتابة الوزن والتاريخ');
 
         const { error } = await _supabase.from('body_weight').insert([{ date, weight }]);
-        if (error) {
-            console.error('Error adding weight:', error);
-            alert('حدث خطأ أثناء الحفظ');
-            return;
+        if (!error) {
+            document.getElementById('dailyWeightInput').value = '';
+            loadBodyWeight();
         }
-        document.getElementById('dailyWeightInput').value = '';
-        loadBodyWeight();
     }
 
     async function deleteWeight(id) {
@@ -405,42 +395,40 @@
         if (!error) loadBodyWeight();
     }
 
-    // --- 3. إدارة الجدول الأسبوعي ---
+    // --- 3. بناء الجدول الأسبوعي للموبايل ---
     function buildWorkoutDays() {
         const container = document.getElementById('daysContainer');
         container.innerHTML = '';
         for (let i = 1; i <= 5; i++) {
             container.innerHTML += `
                 <div class="card day-card">
-                    <h2>اليوم ${i}</h2>
-                    <div class="table-responsive">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th style="width: 18%;">اسم التمرين</th>
-                                    <th style="width: 14%;">الرفعة</th>
-                                    <th style="width: 16%;">نظام المجموعات</th>
-                                    <th style="width: 14%;">العدات والستات</th>
-                                    <th style="width: 13%;">النسبة (%)</th>
-                                    <th style="width: 11%;">RPE</th>
-                                    <th style="width: 14%;">الوزن المطلوب</th>
-                                    <th><button class="btn-action" style="padding: 4px 10px; font-size: 11px;" onclick="addRow(${i})">+ تمرين</button></th>
-                                </tr>
-                            </thead>
-                            <tbody id="day-${i}-rows"></tbody>
-                        </table>
+                    <div class="day-header">
+                        <h2>اليوم ${i}</h2>
+                        <button class="btn-action" onclick="addRow(${i})">+ إضافة تمرين</button>
                     </div>
+                    <table class="mobile-grid-table">
+                        <thead>
+                            <tr>
+                                <th>التمرين</th>
+                                <th>الرفعة</th>
+                                <th>النظام</th>
+                                <th>العدات/الجولات</th>
+                                <th>النسبة %</th>
+                                <th>RPE</th>
+                                <th>الوزن</th>
+                                <th>حذف</th>
+                            </tr>
+                        </thead>
+                        <tbody id="day-${i}-rows"></tbody>
+                    </table>
                 </div>`;
         }
     }
 
     async function loadSchedule() {
-        const { data, error } = await _supabase.from('workout_schedule').select('*');
-        if (error) console.error('Error fetching schedule:', error);
+        const { data } = await _supabase.from('workout_schedule').select('*');
         if (data) {
-            data.forEach(item => {
-                renderRow(item.day_num, item);
-            });
+            data.forEach(item => renderRow(item.day_num, item));
         }
     }
 
@@ -458,29 +446,32 @@
         const tr = document.createElement('tr');
         tr.id = item.id;
         tr.innerHTML = `
-            <td><input type="text" class="ex-name" value="${item.exercise_name || ''}" placeholder="مثال: Pause Squat" oninput="saveRowToDb('${item.id}')"></td>
-            <td>
+            <td data-label="اسم التمرين" class="full-width">
+                <input type="text" class="ex-name" value="${item.exercise_name || ''}" placeholder="اسم التمرين" oninput="saveRowToDb('${item.id}')">
+            </td>
+            <td data-label="نوع الرفعة">
                 <select class="lift-type" onchange="onLiftTypeChange('${item.id}')">
                     <option value="none" ${item.lift_type==='none'?'selected':''}>وزن حر</option>
                     <option value="squat" ${item.lift_type==='squat'?'selected':''}>سكوات</option>
-                    <option value="bench" ${item.lift_type==='bench'?'selected':''}>بنج بريس</option>
+                    <option value="bench" ${item.lift_type==='bench'?'selected':''}>بنج</option>
                     <option value="deadlift" ${item.lift_type==='deadlift'?'selected':''}>ديدليفت</option>
                 </select>
             </td>
-            <td>
+            <td data-label="نظام المجموعات">
                 <select class="set-type" onchange="toggleSetType('${item.id}')">
-                    <option value="single" ${item.set_type==='single'?'selected':''}>مجموعة عادية</option>
-                    <option value="top_back" ${item.set_type==='top_back'?'selected':''}>Top Set + Back Off</option>
+                    <option value="single" ${item.set_type==='single'?'selected':''}>عادي</option>
+                    <option value="top_back" ${item.set_type==='top_back'?'selected':''}>Top + Back</option>
                 </select>
             </td>
-            <td id="reps-container-${item.id}"></td>
-            <td id="pct-container-${item.id}"></td>
-            <td id="rpe-container-${item.id}"></td>
-            <td id="weight-container-${item.id}"></td>
-            <td><button class="btn-delete" onclick="deleteRowFromDb('${item.id}')">حذف</button></td>
+            <td data-label="الستات والعدات" id="reps-container-${item.id}"></td>
+            <td data-label="النسبة %" id="pct-container-${item.id}"></td>
+            <td data-label="مقياس RPE" id="rpe-container-${item.id}"></td>
+            <td data-label="الوزن المطلوب" id="weight-container-${item.id}"></td>
+            <td data-label="" class="full-width" style="margin-top: 5px;">
+                <button class="btn-delete" onclick="deleteRowFromDb('${item.id}')">إزالة التمرين</button>
+            </td>
         `;
         tbody.appendChild(tr);
-
         toggleSetType(item.id, item);
     }
 
@@ -639,14 +630,14 @@
         }
     }
 
-    let saveRowDebounceTimers = {};
+    let saveRowTimers = {};
     function saveRowToDb(rowId) {
-        clearTimeout(saveRowDebounceTimers[rowId]);
-        saveRowDebounceTimers[rowId] = setTimeout(async () => {
+        clearTimeout(saveRowTimers[rowId]);
+        saveRowTimers[rowId] = setTimeout(async () => {
             const row = document.getElementById(rowId);
             if (!row) return;
 
-            const dayNum = parseInt(row.closest('tbody').id.split('-')[1]);
+            const dayNum = parseInt(row.closest('table').parentNode.querySelector('h2').innerText.replace(/\D/g, ''));
             const setType = row.querySelector('.set-type').value;
 
             let repsStr = '', pctStr = '', rpeStr = '';
@@ -672,15 +663,13 @@
                 rpe: rpeStr
             };
 
-            const { error } = await _supabase.from('workout_schedule').upsert([dataPayload]);
-            if (error) console.error('Error saving row:', error);
+            await _supabase.from('workout_schedule').upsert([dataPayload]);
         }, 400);
     }
 
     async function deleteRowFromDb(rowId) {
         document.getElementById(rowId)?.remove();
-        const { error } = await _supabase.from('workout_schedule').delete().eq('id', rowId);
-        if (error) console.error('Error deleting row:', error);
+        await _supabase.from('workout_schedule').delete().eq('id', rowId);
     }
 
     function updateAllCalculations() {
