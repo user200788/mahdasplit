@@ -43,11 +43,11 @@
             margin: 0 auto;
         }
 
-        /* Nav Tabs Responsive */
+        /* Nav Tabs */
         .nav-tabs {
             display: flex;
             gap: 8px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             border-bottom: 2px solid var(--card-border);
             padding-bottom: 10px;
         }
@@ -71,6 +71,60 @@
             color: #ffffff;
             border-color: var(--primary-red);
             box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+        }
+
+        /* Weeks Selector Bar */
+        .weeks-scroll {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-red) var(--card-bg);
+        }
+
+        .weeks-scroll::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .weeks-scroll::-webkit-scrollbar-thumb {
+            background: var(--primary-red);
+            border-radius: 4px;
+        }
+
+        .week-btn {
+            min-width: 90px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-muted);
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+
+        .week-btn span.icon {
+            font-size: 14px;
+        }
+
+        .week-btn:hover {
+            border-color: var(--primary-red);
+            color: #fff;
+        }
+
+        .week-btn.active {
+            background: #220808;
+            border-color: var(--primary-red);
+            color: #ffffff;
+            box-shadow: inset 0 0 8px rgba(220, 38, 38, 0.4);
         }
 
         .page { display: none; }
@@ -158,7 +212,7 @@
             width: 100%;
         }
 
-        /* --- الجدول التكيفي للهواتف (Responsive Table to Cards) --- */
+        /* Responsive Mobile Table Grid */
         .table-responsive { overflow-x: auto; }
 
         table {
@@ -179,7 +233,6 @@
         .set-label { font-size: 9px; color: var(--text-muted); display: block; }
         .calculated-val { font-weight: 800; color: #4ade80; font-size: 13px; }
 
-        /* الشاشات الصغيرة: تحويل الصفوف لكروت سريعة الاستجابة */
         @media (max-width: 768px) {
             .mobile-grid-table thead { display: none; }
             .mobile-grid-table tbody tr {
@@ -210,7 +263,6 @@
                 margin-bottom: 2px;
             }
 
-            /* توسيع حقل اسم التمرين ليعبر الكرت بالكامل */
             .mobile-grid-table td.full-width {
                 grid-column: span 2;
             }
@@ -222,7 +274,7 @@
 <div class="container">
     <div class="nav-tabs">
         <button class="tab-btn active" onclick="switchPage(1, event)">الماكس والوزن</button>
-        <button class="tab-btn" onclick="switchPage(2, event)">جدول التمارين (5 أيام)</button>
+        <button class="tab-btn" onclick="switchPage(2, event)">جدول التمارين (10 أسابيع)</button>
     </div>
 
     <!-- الصفحة الأولى: ماكس الرفعات والوزن -->
@@ -302,8 +354,12 @@
         </div>
     </div>
 
-    <!-- الصفحة الثانية: الجدول الأسبوعي -->
+    <!-- الصفحة الثانية: الجدول الأسبوعي (10 أسابيع) -->
     <div id="page2" class="page">
+        <!-- شريط أيقونات الأسابيع الـ 10 -->
+        <div class="weeks-scroll" id="weeksBar"></div>
+
+        <!-- الأيام الخاصة بالأسبوع المختار -->
         <div id="daysContainer"></div>
     </div>
 </div>
@@ -314,6 +370,8 @@
     const SUPABASE_KEY = 'sb_publishable_6PDUEqp0EgF1Cmd49WRhYA_2XTVocpi';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+    let currentWeek = 1;
+
     function switchPage(pageNum, event) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -321,7 +379,30 @@
         event.target.classList.add('active');
     }
 
-    // --- 1. إدارة أقصى الرفعات (Max Reps) ---
+    // --- 1. بناء شريط الأسابيع الـ 10 ---
+    function buildWeeksBar() {
+        const bar = document.getElementById('weeksBar');
+        bar.innerHTML = '';
+        for (let w = 1; w <= 10; w++) {
+            bar.innerHTML += `
+                <button class="week-btn ${w === 1 ? 'active' : ''}" id="week-btn-${w}" onclick="selectWeek(${w})">
+                    <span class="icon">📅</span>
+                    <span>الأسبوع ${w}</span>
+                </button>
+            `;
+        }
+    }
+
+    function selectWeek(weekNum) {
+        currentWeek = weekNum;
+        document.querySelectorAll('.week-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`week-btn-${weekNum}`)?.classList.add('active');
+        
+        buildWorkoutDays();
+        loadScheduleForCurrentWeek();
+    }
+
+    // --- 2. إدارة أقصى الرفعات (Max Reps) ---
     async function loadMaxReps() {
         try {
             const { data, error } = await _supabase.from('max_reps').select('*');
@@ -360,7 +441,7 @@
         }, 500);
     }
 
-    // --- 2. إدارة الوزن اليومي ---
+    // --- 3. إدارة الوزن اليومي ---
     async function loadBodyWeight() {
         const { data } = await _supabase.from('body_weight').select('*').order('date', { ascending: false });
         const tbody = document.getElementById('weightHistoryTable');
@@ -395,16 +476,16 @@
         if (!error) loadBodyWeight();
     }
 
-    // --- 3. بناء الجدول الأسبوعي للموبايل ---
+    // --- 4. بناء الأيام الخمسة للأسبوع المختار ---
     function buildWorkoutDays() {
         const container = document.getElementById('daysContainer');
         container.innerHTML = '';
-        for (let i = 1; i <= 5; i++) {
+        for (let d = 1; d <= 5; d++) {
             container.innerHTML += `
                 <div class="card day-card">
                     <div class="day-header">
-                        <h2>اليوم ${i}</h2>
-                        <button class="btn-action" onclick="addRow(${i})">+ إضافة تمرين</button>
+                        <h2>اليوم ${d} - الأسبوع ${currentWeek}</h2>
+                        <button class="btn-action" onclick="addRow(${d})">+ إضافة تمرين</button>
                     </div>
                     <table class="mobile-grid-table">
                         <thead>
@@ -419,14 +500,18 @@
                                 <th>حذف</th>
                             </tr>
                         </thead>
-                        <tbody id="day-${i}-rows"></tbody>
+                        <tbody id="day-${d}-rows"></tbody>
                     </table>
                 </div>`;
         }
     }
 
-    async function loadSchedule() {
-        const { data } = await _supabase.from('workout_schedule').select('*');
+    async function loadScheduleForCurrentWeek() {
+        const { data } = await _supabase
+            .from('workout_schedule')
+            .select('*')
+            .eq('week_num', currentWeek);
+            
         if (data) {
             data.forEach(item => renderRow(item.day_num, item));
         }
@@ -434,7 +519,17 @@
 
     function addRow(dayNum) {
         const rowId = 'row_' + Date.now() + Math.random().toString(36).substr(2, 4);
-        const rowData = { id: rowId, day_num: dayNum, exercise_name: '', lift_type: 'none', set_type: 'single', reps: '', pct: '', rpe: '' };
+        const rowData = { 
+            id: rowId, 
+            week_num: currentWeek, 
+            day_num: dayNum, 
+            exercise_name: '', 
+            lift_type: 'none', 
+            set_type: 'single', 
+            reps: '', 
+            pct: '', 
+            rpe: '' 
+        };
         renderRow(dayNum, rowData);
         saveRowToDb(rowId);
     }
@@ -637,7 +732,8 @@
             const row = document.getElementById(rowId);
             if (!row) return;
 
-            const dayNum = parseInt(row.closest('table').parentNode.querySelector('h2').innerText.replace(/\D/g, ''));
+            const headerText = row.closest('.day-card').querySelector('h2').innerText;
+            const dayNum = parseInt(headerText.match(/اليوم (\d+)/)[1]);
             const setType = row.querySelector('.set-type').value;
 
             let repsStr = '', pctStr = '', rpeStr = '';
@@ -654,6 +750,7 @@
 
             const dataPayload = {
                 id: rowId,
+                week_num: currentWeek,
                 day_num: dayNum,
                 exercise_name: row.querySelector('.ex-name')?.value || '',
                 lift_type: row.querySelector('.lift-type')?.value || 'none',
@@ -677,11 +774,12 @@
     }
 
     window.onload = async function() {
+        buildWeeksBar();
         buildWorkoutDays();
         document.getElementById('weightDate').valueAsDate = new Date();
         await loadMaxReps();
         await loadBodyWeight();
-        await loadSchedule();
+        await loadScheduleForCurrentWeek();
     };
 </script>
 
