@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة التدريب الاحترافية - Powerlifting</title>
+    <!-- خط Cairo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Supabase JS Client Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        :root {
+            --bg-color: #0d0d0d;
+            --card-bg: #161616;
+            --card-border: #262626;
+            --primary-red: #dc2626;
+            --red-hover: #b91c1c;
+            --text-main: #f5f5f5;
+            --text-muted: #a3a3a3;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 30px 15px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--card-border);
+            padding-bottom: 12px;
+        }
+
+        .tab-btn {
+            background: var(--card-bg);
+            color: var(--text-muted);
+            border: 1px solid var(--card-border);
+            padding: 12px 28px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 700;
+            transition: all 0.25s ease-in-out;
+        }
+
+        .tab-btn:hover {
+            border-color: var(--primary-red);
+            color: #fff;
+        }
+
+        .tab-btn.active {
+            background: var(--primary-red);
+            color: #ffffff;
+            border-color: var(--primary-red);
+            box-shadow: 0 4px 14px rgba(220, 38, 38, 0.4);
+        }
+
+        .page { display: none; }
+        .page.active { display: block; }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 25px;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        .day-card { border-right: 5px solid var(--primary-red); }
+
+        h2 {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 15px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h2::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 20px;
+            background-color: var(--primary-red);
+        }
+
+        p.desc {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .field { flex: 1; min-width: 220px; }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--card-border);
+            background: #0a0a0a;
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 600;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus { border-color: var(--primary-red); }
+
+        .table-responsive { overflow-x: auto; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background-color: #111111;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        th, td {
+            border: 1px solid var(--card-border);
+            padding: 10px 8px;
+            text-align: center;
+            font-size: 13px;
+            vertical-align: middle;
+        }
+
+        th { background-color: #1c1c1c; color: var(--text-main); font-weight: 700; }
+
+        .table-input {
+            width: 80px;
+            padding: 6px;
+            text-align: center;
+            margin: 0 auto;
+        }
+
+        .dual-inputs { display: flex; flex-direction: column; gap: 6px; }
+        .dual-inputs input { font-size: 12px; padding: 5px; }
+
+        .set-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .calculated-val { font-weight: 800; color: #4ade80; font-size: 14px; }
+
+        .btn-action {
+            background: var(--primary-red);
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 13px;
+            transition: background 0.2s;
+        }
+
+        .btn-action:hover { background: var(--red-hover); }
+
+        .btn-delete {
+            background: #262626;
+            color: #ef4444;
+            border: 1px solid #3f3f46;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .btn-delete:hover { background: #ef4444; color: #fff; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchPage(1, event)">بيانات ماكس الرفعات والوزن اليومي</button>
+        <button class="tab-btn" onclick="switchPage(2, event)">الجدول التدريبي الأسبوعي (5 أيام)</button>
+    </div>
+
+    <!-- الصفحة الأولى -->
+    <div id="page1" class="page active">
+        <div class="card">
+            <h2>سجل أقصى أوزان العدات (Max Reps)</h2>
+            <p class="desc">تُحفظ التغييرات تلقائياً وتُحدث حسابات أوزان التمارين في الجدول فوراً:</p>
+            
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 20%;">نوع الرفعة</th>
+                            <th style="color: var(--primary-red);">1 عدّة (1RM)</th>
+                            <th>عدتان (2)</th>
+                            <th>3 عدّات</th>
+                            <th>4 عدّات</th>
+                            <th>5 عدّات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>السكوات (Squat)</strong></td>
+                            <td><input type="number" id="squat_1" class="table-input" value="100" style="border-color: var(--primary-red);" oninput="saveMaxReps('squat')"></td>
+                            <td><input type="number" id="squat_2" class="table-input" value="95" oninput="saveMaxReps('squat')"></td>
+                            <td><input type="number" id="squat_3" class="table-input" value="90" oninput="saveMaxReps('squat')"></td>
+                            <td><input type="number" id="squat_4" class="table-input" value="85" oninput="saveMaxReps('squat')"></td>
+                            <td><input type="number" id="squat_5" class="table-input" value="80" oninput="saveMaxReps('squat')"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>البنج بريس (Bench)</strong></td>
+                            <td><input type="number" id="bench_1" class="table-input" value="100" style="border-color: var(--primary-red);" oninput="saveMaxReps('bench')"></td>
+                            <td><input type="number" id="bench_2" class="table-input" value="95" oninput="saveMaxReps('bench')"></td>
+                            <td><input type="number" id="bench_3" class="table-input" value="90" oninput="saveMaxReps('bench')"></td>
+                            <td><input type="number" id="bench_4" class="table-input" value="85" oninput="saveMaxReps('bench')"></td>
+                            <td><input type="number" id="bench_5" class="table-input" value="80" oninput="saveMaxReps('bench')"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>الديدليفت (Deadlift)</strong></td>
+                            <td><input type="number" id="deadlift_1" class="table-input" value="100" style="border-color: var(--primary-red);" oninput="saveMaxReps('deadlift')"></td>
+                            <td><input type="number" id="deadlift_2" class="table-input" value="95" oninput="saveMaxReps('deadlift')"></td>
+                            <td><input type="number" id="deadlift_3" class="table-input" value="90" oninput="saveMaxReps('deadlift')"></td>
+                            <td><input type="number" id="deadlift_4" class="table-input" value="85" oninput="saveMaxReps('deadlift')"></td>
+                            <td><input type="number" id="deadlift_5" class="table-input" value="80" oninput="saveMaxReps('deadlift')"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>متابعة وزن اللاعب اليومي</h2>
+            <div class="input-group">
+                <div class="field">
+                    <label>التاريخ</label>
+                    <input type="date" id="weightDate">
+                </div>
+                <div class="field">
+                    <label>وزن الجسم (kg)</label>
+                    <input type="number" step="0.1" id="dailyWeightInput" placeholder="مثال: 74.5">
+                </div>
+                <div class="field" style="align-self: flex-end;">
+                    <button class="btn-action" style="width: 100%; height: 42px;" onclick="addDailyWeight()">حفظ الوزن</button>
+                </div>
+            </div>
+            
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>التاريخ</th>
+                            <th>الوزن المسجل (kg)</th>
+                            <th>إجراء</th>
+                        </tr>
+                    </thead>
+                    <tbody id="weightHistoryTable">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- الصفحة الثانية -->
+    <div id="page2" class="page">
+        <div class="card">
+            <h2>الجدول الأسبوعي (5 أيام)</h2>
+            <p class="desc">يتم الحفظ والتزامن مع قاعدة البيانات تلقائياً عند تغيير أو إضافة أي تمرين.</p>
+        </div>
+        <div id="daysContainer"></div>
+    </div>
+</div>
+
+<script>
+    // تهيئة Supabase
+    const SUPABASE_URL = 'https://zkgkpguurqyizzbzxuzd.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_6PDUEqp0EgF1Cmd49WRhYA_2XTVocpi';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    function switchPage(pageNum, event) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`page${pageNum}`).classList.add('active');
+        event.target.classList.add('active');
+    }
+
+    // --- 1. إدارة ماكس الرفعات ---
+    async function loadMaxReps() {
+        try {
+            const { data, error } = await _supabase.from('max_reps').select('*');
+            if (error) console.error('Error fetching max reps:', error);
+            if (data && data.length > 0) {
+                data.forEach(row => {
+                    for (let i = 1; i <= 5; i++) {
+                        const el = document.getElementById(`${row.lift}_${i}`);
+                        if (el && row[`rep${i}`] !== undefined) {
+                            el.value = row[`rep${i}`];
+                        }
+                    }
+                });
+            }
+        } catch (e) {
+            console.error(e);
+        } finally {
+            updateAllCalculations();
+        }
+    }
+
+    let maxRepsDebounceTimer = null;
+    function saveMaxReps(lift) {
+        updateAllCalculations();
+        clearTimeout(maxRepsDebounceTimer);
+        maxRepsDebounceTimer = setTimeout(async () => {
+            const rowData = {
+                lift: lift,
+                rep1: parseFloat(document.getElementById(`${lift}_1`).value) || 0,
+                rep2: parseFloat(document.getElementById(`${lift}_2`).value) || 0,
+                rep3: parseFloat(document.getElementById(`${lift}_3`).value) || 0,
+                rep4: parseFloat(document.getElementById(`${lift}_4`).value) || 0,
+                rep5: parseFloat(document.getElementById(`${lift}_5`).value) || 0
+            };
+            const { error } = await _supabase.from('max_reps').upsert([rowData], { onConflict: 'lift' });
+            if (error) console.error('Error saving max reps:', error);
+        }, 500);
+    }
+
+    // --- 2. إدارة الوزن اليومي ---
+    async function loadBodyWeight() {
+        const { data, error } = await _supabase.from('body_weight').select('*').order('date', { ascending: false });
+        if (error) console.error('Error fetching weights:', error);
+        const tbody = document.getElementById('weightHistoryTable');
+        tbody.innerHTML = '';
+        if (data) {
+            data.forEach(item => {
+                tbody.innerHTML += `
+                    <tr id="weight-${item.id}">
+                        <td>${item.date}</td>
+                        <td><strong>${item.weight} kg</strong></td>
+                        <td><button class="btn-delete" onclick="deleteWeight(${item.id})">حذف</button></td>
+                    </tr>`;
+            });
+        }
+    }
+
+    async function addDailyWeight() {
+        const date = document.getElementById('weightDate').value;
+        const weight = parseFloat(document.getElementById('dailyWeightInput').value);
+
+        if (!date || !weight) {
+            alert('الرجاء تعبئة التاريخ والوزن');
+            return;
+        }
+
+        const { error } = await _supabase.from('body_weight').insert([{ date, weight }]);
+        if (error) {
+            console.error('Error adding weight:', error);
+            alert('حدث خطأ أثناء الحفظ');
+            return;
+        }
+        document.getElementById('dailyWeightInput').value = '';
+        loadBodyWeight();
+    }
+
+    async function deleteWeight(id) {
+        const { error } = await _supabase.from('body_weight').delete().eq('id', id);
+        if (!error) loadBodyWeight();
+    }
+
+    // --- 3. إدارة الجدول الأسبوعي ---
+    function buildWorkoutDays() {
+        const container = document.getElementById('daysContainer');
+        container.innerHTML = '';
+        for (let i = 1; i <= 5; i++) {
+            container.innerHTML += `
+                <div class="card day-card">
+                    <h2>اليوم ${i}</h2>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 18%;">اسم التمرين</th>
+                                    <th style="width: 14%;">الرفعة</th>
+                                    <th style="width: 16%;">نظام المجموعات</th>
+                                    <th style="width: 14%;">العدات والستات</th>
+                                    <th style="width: 13%;">النسبة (%)</th>
+                                    <th style="width: 11%;">RPE</th>
+                                    <th style="width: 14%;">الوزن المطلوب</th>
+                                    <th><button class="btn-action" style="padding: 4px 10px; font-size: 11px;" onclick="addRow(${i})">+ تمرين</button></th>
+                                </tr>
+                            </thead>
+                            <tbody id="day-${i}-rows"></tbody>
+                        </table>
+                    </div>
+                </div>`;
+        }
+    }
+
+    async function loadSchedule() {
+        const { data, error } = await _supabase.from('workout_schedule').select('*');
+        if (error) console.error('Error fetching schedule:', error);
+        if (data) {
+            data.forEach(item => {
+                renderRow(item.day_num, item);
+            });
+        }
+    }
+
+    function addRow(dayNum) {
+        const rowId = 'row_' + Date.now() + Math.random().toString(36).substr(2, 4);
+        const rowData = { id: rowId, day_num: dayNum, exercise_name: '', lift_type: 'none', set_type: 'single', reps: '', pct: '', rpe: '' };
+        renderRow(dayNum, rowData);
+        saveRowToDb(rowId);
+    }
+
+    function renderRow(dayNum, item) {
+        const tbody = document.getElementById(`day-${dayNum}-rows`);
+        if (!tbody) return;
+
+        const tr = document.createElement('tr');
+        tr.id = item.id;
+        tr.innerHTML = `
+            <td><input type="text" class="ex-name" value="${item.exercise_name || ''}" placeholder="مثال: Pause Squat" oninput="saveRowToDb('${item.id}')"></td>
+            <td>
+                <select class="lift-type" onchange="onLiftTypeChange('${item.id}')">
+                    <option value="none" ${item.lift_type==='none'?'selected':''}>وزن حر</option>
+                    <option value="squat" ${item.lift_type==='squat'?'selected':''}>سكوات</option>
+                    <option value="bench" ${item.lift_type==='bench'?'selected':''}>بنج بريس</option>
+                    <option value="deadlift" ${item.lift_type==='deadlift'?'selected':''}>ديدليفت</option>
+                </select>
+            </td>
+            <td>
+                <select class="set-type" onchange="toggleSetType('${item.id}')">
+                    <option value="single" ${item.set_type==='single'?'selected':''}>مجموعة عادية</option>
+                    <option value="top_back" ${item.set_type==='top_back'?'selected':''}>Top Set + Back Off</option>
+                </select>
+            </td>
+            <td id="reps-container-${item.id}"></td>
+            <td id="pct-container-${item.id}"></td>
+            <td id="rpe-container-${item.id}"></td>
+            <td id="weight-container-${item.id}"></td>
+            <td><button class="btn-delete" onclick="deleteRowFromDb('${item.id}')">حذف</button></td>
+        `;
+        tbody.appendChild(tr);
+
+        toggleSetType(item.id, item);
+    }
+
+    function onLiftTypeChange(rowId) {
+        calculateRowWeight(rowId);
+        saveRowToDb(rowId);
+    }
+
+    function toggleSetType(rowId, savedData = null) {
+        const row = document.getElementById(rowId);
+        if (!row) return;
+
+        const setType = row.querySelector('.set-type').value;
+
+        const repsContainer = document.getElementById(`reps-container-${rowId}`);
+        const pctContainer = document.getElementById(`pct-container-${rowId}`);
+        const rpeContainer = document.getElementById(`rpe-container-${rowId}`);
+        const weightContainer = document.getElementById(`weight-container-${rowId}`);
+
+        let repsVal = savedData ? savedData.reps : '';
+        let pctVal = savedData ? savedData.pct : '';
+        let rpeVal = savedData ? savedData.rpe : '';
+
+        if (setType === 'top_back') {
+            const [rTop, rBack] = repsVal.split('|');
+            const [pTop, pBack] = pctVal.split('|');
+            const [rpTop, rpBack] = rpeVal.split('|');
+
+            repsContainer.innerHTML = `
+                <div class="dual-inputs">
+                    <div><span class="set-label">Top:</span><input type="text" class="rep-top" value="${rTop||''}" placeholder="1x1" oninput="saveRowToDb('${rowId}')"></div>
+                    <div><span class="set-label">Back:</span><input type="text" class="rep-back" value="${rBack||''}" placeholder="3x5" oninput="saveRowToDb('${rowId}')"></div>
+                </div>`;
+            pctContainer.innerHTML = `
+                <div class="dual-inputs">
+                    <input type="number" class="pct-top" value="${pTop||''}" placeholder="Top %" oninput="handleIntensityChange('${rowId}', 'pct')">
+                    <input type="number" class="pct-back" value="${pBack||''}" placeholder="Back %" oninput="handleIntensityChange('${rowId}', 'pct')">
+                </div>`;
+            rpeContainer.innerHTML = `
+                <div class="dual-inputs">
+                    <input type="number" step="0.5" class="rpe-top" value="${rpTop||''}" placeholder="Top RPE" oninput="handleIntensityChange('${rowId}', 'rpe')">
+                    <input type="number" step="0.5" class="rpe-back" value="${rpBack||''}" placeholder="Back RPE" oninput="handleIntensityChange('${rowId}', 'rpe')">
+                </div>`;
+            weightContainer.innerHTML = `
+                <div class="dual-inputs">
+                    <div><span class="set-label">Top:</span><span class="calculated-val weight-top">0 kg</span></div>
+                    <div><span class="set-label">Back:</span><span class="calculated-val weight-back">0 kg</span></div>
+                </div>`;
+        } else {
+            repsContainer.innerHTML = `<input type="text" class="rep-single" value="${repsVal}" placeholder="3x5" oninput="saveRowToDb('${rowId}')">`;
+            pctContainer.innerHTML = `<input type="number" class="pct-input" value="${pctVal}" placeholder="75" oninput="handleIntensityChange('${rowId}', 'pct')">`;
+            rpeContainer.innerHTML = `<input type="number" step="0.5" class="rpe-input" value="${rpeVal}" placeholder="@ 8" oninput="handleIntensityChange('${rowId}', 'rpe')">`;
+            weightContainer.innerHTML = `<span class="calculated-val weight-result">0 kg</span>`;
+        }
+
+        handleIntensityChange(rowId, 'init');
+    }
+
+    function handleIntensityChange(rowId, source) {
+        const row = document.getElementById(rowId);
+        if (!row) return;
+
+        const setType = row.querySelector('.set-type').value;
+
+        if (setType === 'single') {
+            const pct = row.querySelector('.pct-input');
+            const rpe = row.querySelector('.rpe-input');
+            if (pct && rpe) {
+                if (source === 'pct' && pct.value !== '') rpe.style.display = 'none';
+                else if (source === 'pct' && pct.value === '') rpe.style.display = 'block';
+                if (source === 'rpe' && rpe.value !== '') pct.style.display = 'none';
+                else if (source === 'rpe' && rpe.value === '') pct.style.display = 'block';
+            }
+        } else {
+            const pctTop = row.querySelector('.pct-top'), pctBack = row.querySelector('.pct-back');
+            const rpeTop = row.querySelector('.rpe-top'), rpeBack = row.querySelector('.rpe-back');
+            if (pctTop && pctBack && rpeTop && rpeBack) {
+                if (source === 'pct') {
+                    rpeTop.style.display = pctTop.value !== '' ? 'none' : 'block';
+                    rpeBack.style.display = pctBack.value !== '' ? 'none' : 'block';
+                } else if (source === 'rpe') {
+                    pctTop.style.display = rpeTop.value !== '' ? 'none' : 'block';
+                    pctBack.style.display = rpeBack.value !== '' ? 'none' : 'block';
+                }
+            }
+        }
+
+        calculateRowWeight(rowId);
+        if (source !== 'init') saveRowToDb(rowId);
+    }
+
+    function calculateRowWeight(rowId) {
+        const row = document.getElementById(rowId);
+        if (!row) return;
+
+        const liftType = row.querySelector('.lift-type').value;
+        const setType = row.querySelector('.set-type').value;
+
+        let baseMax = 0;
+        if (liftType === 'squat') baseMax = parseFloat(document.getElementById('squat_1').value) || 0;
+        if (liftType === 'bench') baseMax = parseFloat(document.getElementById('bench_1').value) || 0;
+        if (liftType === 'deadlift') baseMax = parseFloat(document.getElementById('deadlift_1').value) || 0;
+
+        if (setType === 'single') {
+            const pct = parseFloat(row.querySelector('.pct-input')?.value) || 0;
+            const rpe = parseFloat(row.querySelector('.rpe-input')?.value) || 0;
+            const res = row.querySelector('.weight-result');
+
+            if (!res) return;
+
+            if (pct > 0 && liftType !== 'none' && baseMax > 0) {
+                res.innerText = `${(baseMax * (pct / 100)).toFixed(1)} kg`;
+                res.style.color = '#4ade80';
+            } else if (rpe > 0) {
+                res.innerText = `@ RPE ${rpe}`;
+                res.style.color = '#f59e0b';
+            } else {
+                res.innerText = 'حسب الشعور';
+                res.style.color = 'var(--text-muted)';
+            }
+        } else {
+            const pctTop = parseFloat(row.querySelector('.pct-top')?.value) || 0;
+            const pctBack = parseFloat(row.querySelector('.pct-back')?.value) || 0;
+            const rpeTop = parseFloat(row.querySelector('.rpe-top')?.value) || 0;
+            const rpeBack = parseFloat(row.querySelector('.rpe-back')?.value) || 0;
+
+            const resTop = row.querySelector('.weight-top');
+            const resBack = row.querySelector('.weight-back');
+
+            if (!resTop || !resBack) return;
+
+            let topWeightVal = 0;
+            if (pctTop > 0 && liftType !== 'none' && baseMax > 0) {
+                topWeightVal = baseMax * (pctTop / 100);
+                resTop.innerText = `${topWeightVal.toFixed(1)} kg`;
+                resTop.style.color = '#4ade80';
+            } else if (rpeTop > 0) {
+                resTop.innerText = `@ RPE ${rpeTop}`;
+                resTop.style.color = '#f59e0b';
+            } else {
+                resTop.innerText = 'حر';
+                resTop.style.color = 'var(--text-muted)';
+            }
+
+            if (pctBack > 0 && topWeightVal > 0) {
+                const backWeightVal = topWeightVal * (pctBack / 100);
+                resBack.innerText = `${backWeightVal.toFixed(1)} kg`;
+                resBack.style.color = '#4ade80';
+            } else if (rpeBack > 0) {
+                resBack.innerText = `@ RPE ${rpeBack}`;
+                resBack.style.color = '#f59e0b';
+            } else {
+                resBack.innerText = 'حر';
+                resBack.style.color = 'var(--text-muted)';
+            }
+        }
+    }
+
+    let saveRowDebounceTimers = {};
+    function saveRowToDb(rowId) {
+        clearTimeout(saveRowDebounceTimers[rowId]);
+        saveRowDebounceTimers[rowId] = setTimeout(async () => {
+            const row = document.getElementById(rowId);
+            if (!row) return;
+
+            const dayNum = parseInt(row.closest('tbody').id.split('-')[1]);
+            const setType = row.querySelector('.set-type').value;
+
+            let repsStr = '', pctStr = '', rpeStr = '';
+
+            if (setType === 'single') {
+                repsStr = row.querySelector('.rep-single')?.value || '';
+                pctStr = row.querySelector('.pct-input')?.value || '';
+                rpeStr = row.querySelector('.rpe-input')?.value || '';
+            } else {
+                repsStr = `${row.querySelector('.rep-top')?.value || ''}|${row.querySelector('.rep-back')?.value || ''}`;
+                pctStr = `${row.querySelector('.pct-top')?.value || ''}|${row.querySelector('.pct-back')?.value || ''}`;
+                rpeStr = `${row.querySelector('.rpe-top')?.value || ''}|${row.querySelector('.rpe-back')?.value || ''}`;
+            }
+
+            const dataPayload = {
+                id: rowId,
+                day_num: dayNum,
+                exercise_name: row.querySelector('.ex-name')?.value || '',
+                lift_type: row.querySelector('.lift-type')?.value || 'none',
+                set_type: setType,
+                reps: repsStr,
+                pct: pctStr,
+                rpe: rpeStr
+            };
+
+            const { error } = await _supabase.from('workout_schedule').upsert([dataPayload]);
+            if (error) console.error('Error saving row:', error);
+        }, 400);
+    }
+
+    async function deleteRowFromDb(rowId) {
+        document.getElementById(rowId)?.remove();
+        const { error } = await _supabase.from('workout_schedule').delete().eq('id', rowId);
+        if (error) console.error('Error deleting row:', error);
+    }
+
+    function updateAllCalculations() {
+        document.querySelectorAll('tr[id^="row_"]').forEach(tr => calculateRowWeight(tr.id));
+    }
+
+    window.onload = async function() {
+        buildWorkoutDays();
+        document.getElementById('weightDate').valueAsDate = new Date();
+        await loadMaxReps();
+        await loadBodyWeight();
+        await loadSchedule();
+    };
+</script>
+
+</body>
+</html>
