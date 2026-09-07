@@ -73,7 +73,7 @@
             box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
         }
 
-        /* Controls Bar for Weeks */
+        /* Weeks Controls */
         .weeks-control-bar {
             display: flex;
             align-items: center;
@@ -352,13 +352,13 @@
             <button class="btn-del-week" onclick="deleteCurrentWeek()">حذف الأسبوع</button>
         </div>
 
-        <!-- أزرار الأيام للأسبوع الحقيقي -->
+        <!-- أزرار الأيام -->
         <div class="days-controls">
             <h3 id="currentWeekTitle" style="color: #fff; font-size: 16px;">الأسبوع 1</h3>
             <button class="btn-action" onclick="addNewDay()">+ إضافة يوم تدريبي</button>
         </div>
 
-        <!-- الأيام الخاصة بالأسبوع المختار -->
+        <!-- الأيام والمقابلة لجدول التمارين -->
         <div id="daysContainer"></div>
     </div>
 </div>
@@ -380,12 +380,11 @@
 
     // --- 1. إدارة الأسابيع الديناميكية ---
     async function loadWeeks() {
-        const { data, error } = await _supabase.from('workout_weeks').select('*').order('week_num', { ascending: true });
+        const { data } = await _supabase.from('workout_weeks').select('*').order('week_num', { ascending: true });
         
         if (data && data.length > 0) {
             weeksList = data.map(w => w.week_num);
         } else {
-            // إضافة الأسبوع 1 كافتراضي إذا لم تكن هناك أسابيع
             await _supabase.from('workout_weeks').insert([{ week_num: 1 }]);
             weeksList = [1];
         }
@@ -438,21 +437,20 @@
         loadDaysForWeek(currentWeek);
     }
 
-    // --- 2. إدارة الأيام والتمرينات ---
+    // --- 2. إدارة الأيام والتمرينات بالترتيب الزمني ---
     async function loadDaysForWeek(weekNum) {
         const container = document.getElementById('daysContainer');
         container.innerHTML = '';
 
+        // ترتيب جلب التمارين حسب وقت الإضافة لضمان الترتيب الصحيح
         const { data } = await _supabase
             .from('workout_schedule')
             .select('*')
             .eq('week_num', weekNum)
-            .order('day_num', { ascending: true });
+            .order('created_at', { ascending: true });
 
-        // تجميع الأيام المتاحة لهذا الأسبوع
-        const dayNumbers = [...new Set(data ? data.map(i => i.day_num) : [])];
+        const dayNumbers = [...new Set(data ? data.map(i => i.day_num) : [])].sort((a, b) => a - b);
         
-        // إذا كان أسبوع جديد بدون أيام، نبدأ باليوم 1 تلقائياً
         if (dayNumbers.length === 0) {
             renderDayCard(1);
         } else {
@@ -525,7 +523,8 @@
             set_type: 'single', 
             reps: '', 
             pct: '', 
-            rpe: '' 
+            rpe: '',
+            created_at: new Date().toISOString()
         };
         renderRow(dayNum, rowData);
         saveRowToDb(rowId);
@@ -537,6 +536,7 @@
 
         const tr = document.createElement('tr');
         tr.id = item.id;
+        tr.dataset.createdAt = item.created_at || new Date().toISOString();
         tr.innerHTML = `
             <td data-label="اسم التمرين" class="full-width">
                 <input type="text" class="ex-name" value="${item.exercise_name || ''}" placeholder="اسم التمرين" oninput="saveRowToDb('${item.id}')">
@@ -754,7 +754,8 @@
                 set_type: setType,
                 reps: repsStr,
                 pct: pctStr,
-                rpe: rpeStr
+                rpe: rpeStr,
+                created_at: row.dataset.createdAt
             };
 
             await _supabase.from('workout_schedule').upsert([dataPayload]);
