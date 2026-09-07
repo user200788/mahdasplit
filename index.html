@@ -147,6 +147,18 @@
             white-space: nowrap;
         }
 
+        .btn-copy-weeks {
+            background: #2563eb;
+            color: #ffffff;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 11px;
+            white-space: nowrap;
+        }
+
         .days-controls {
             display: flex;
             justify-content: space-between;
@@ -174,6 +186,8 @@
             margin-bottom: 15px;
             border-bottom: 1px solid var(--card-border);
             padding-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 8px;
         }
 
         h2 { font-size: 18px; font-weight: 800; color: #ffffff; }
@@ -442,7 +456,6 @@
         const container = document.getElementById('daysContainer');
         container.innerHTML = '';
 
-        // ترتيب جلب التمارين حسب وقت الإضافة لضمان الترتيب الصحيح
         const { data } = await _supabase
             .from('workout_schedule')
             .select('*')
@@ -472,7 +485,8 @@
         div.innerHTML = `
             <div class="day-header">
                 <h2>اليوم ${dayNum}</h2>
-                <div style="display:flex; gap: 8px;">
+                <div style="display:flex; gap: 8px; align-items: center;">
+                    ${currentWeek === 1 ? `<button class="btn-copy-weeks" onclick="copyDayToAllWeeks(${dayNum})">تطبيق على باقي الأسابيع 🔄</button>` : ''}
                     <button class="btn-action" onclick="addRow(${dayNum})">+ إضافة تمرين</button>
                     <button class="btn-delete" style="width:auto;" onclick="deleteDay(${dayNum})">حذف اليوم</button>
                 </div>
@@ -494,6 +508,49 @@
             </table>
         `;
         container.appendChild(div);
+    }
+
+    // تكرار تمارين اليوم من الأسبوع الأول لكل الأسابيع الأخرى برمجياً
+    async function copyDayToAllWeeks(dayNum) {
+        if (weeksList.length <= 1) return alert("لا توجد أسابيع أخرى لتنسخ إليها!");
+        if (!confirm(`هل أنت تأكد من نسخ تمارين اليوم ${dayNum} من الأسبوع الأول إلى جميع الأسابيع الباقية؟`)) return;
+
+        // جلب تمارين الأسبوع الأول لليوم المكتمل
+        const { data: week1Exercises } = await _supabase
+            .from('workout_schedule')
+            .select('*')
+            .eq('week_num', 1)
+            .eq('day_num', dayNum)
+            .order('created_at', { ascending: true });
+
+        if (!week1Exercises || week1Exercises.length === 0) {
+            return alert("لا توجد تمارين مضافة في هذا اليوم لنقلها!");
+        }
+
+        const targetWeeks = weeksList.filter(w => w !== 1);
+
+        for (const week of targetWeeks) {
+            // مسح تمارين هذا اليوم للأسبوع المستهدف تجنباً لتكرار البيانات
+            await _supabase.from('workout_schedule').delete().eq('week_num', week).eq('day_num', dayNum);
+
+            // تحضير مصفوفة التمارين المنسوخة مع إعطاء معرفات وقيم جديدة
+            const copyPayload = week1Exercises.map((item, idx) => ({
+                id: 'row_' + Date.now() + Math.random().toString(36).substr(2, 4) + idx,
+                week_num: week,
+                day_num: dayNum,
+                exercise_name: item.exercise_name,
+                lift_type: item.lift_type,
+                set_type: item.set_type,
+                reps: item.reps,
+                pct: item.pct,
+                rpe: item.rpe,
+                created_at: new Date(Date.now() + idx * 100).toISOString() // للحفاظ على نفس التسلسل الزمني
+            }));
+
+            await _supabase.from('workout_schedule').insert(copyPayload);
+        }
+
+        alert("تم نسخ التمارين بنجاح لجميع الأسابيع الباقية 🎉");
     }
 
     async function addNewDay() {
